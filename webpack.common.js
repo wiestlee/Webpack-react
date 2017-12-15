@@ -52,7 +52,7 @@ module.exports = {
 
 	},
 	plugins: [ // 插件配置
-	 // new CleanWebpackPlugin(['build']),  //清空编译输出的文件夹
+	  new CleanWebpackPlugin(['build']),  //清空编译输出的文件夹
 	  new HtmlWebpackPlugin({
 	  	 title: 'react-webpack-wie',
 	  	 filename:'index.html',
