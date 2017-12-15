@@ -120,6 +120,144 @@ npm install extract-text-webpack-plugin --save-dev
 >* postcss-loader: CSS转化样式插件
 >* extract-text-webpack-plugin: 把CSS分离成文件 把less或sass处理好后放到一个css文件中用这个插件实现
 
+# 配置模块
+
+---
+
+在项目根目录下生成.babelrc文件(window下文件重命名为.babelrc),并写入如下数据
+
+```
+{
+	"presets":["env","react"]
+}
+```
+配置package.json文件：运行npm run build 启动编译模式和 npm run start 热更新模式：
+
+```
+"scripts":{
+	"dev": "webpack-dev-server --config webpack.dev.js",
+	"build": "webpack --config webpack.prod.js",
+	"watch": "webpack --progress --colors --watch"
+}
+```
+根据目录新建webpack配置文件：webpack.common.js、webpack.dev.js、webpack.prod.js;
+
+**webpack.common.js**(公用配置)
+
+```
+const path = require('path');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const webpack = require('webpack');
+const ExtractTextPlugin = require('extract-text-webpack-plugin'); //把sass或CSS处理好后，放到一个CSS文件中，把CSS分离成文件
+
+module.exports = {
+	entry: ['babel-polyfill','./src/index.js'], //添加入口文件，多个依赖文件一起注入。
+	output: { // 项目的输出配置
+		path:path.resolve(__dirname,'build'), //文件的输出目录 __dirname：表示当前的路径
+		filename: 'static/js/[name].[hash:5].js'
+	},
+	module: {  //模块加载
+		rules: [
+            {
+
+            	test: /\.css$/,  //匹配规则
+            	use:[
+                     "style-loader",
+            		 "css-loader"           		
+            	]
+            },{
+            	test:/\.scss$/,
+            	use:ExtractTextPlugin.extract({
+            		fallback: 'style-loader',
+            		use: ['css-loader','sass-loader']
+            	})
+            },{
+            	test: /\.less$/,
+            	use: ExtractTextPlugin.extract({
+            		fallback: 'style-loader',
+            		use: ['css-loader','less-loader']
+            	})
+            },{
+            	test: /\.jsx?$/,
+            	exclude: /node_modules/,
+            	use: {
+            		loader: 'babel-loader'
+            	}
+            },{
+            	test: /\.(png|svg|jpg|gif)$/,
+            	use: {
+            		loader: 'url-loader',
+            		options: {
+            			limit: 8912,
+            			name: 'static/images/[name].[hash:5].[ext]'
+            		}
+            	}
+            }
+
+		]
+
+	},
+	plugins: [ // 插件配置
+	 // new CleanWebpackPlugin(['build']),  //清空编译输出的文件夹
+	  new HtmlWebpackPlugin({
+	  	 title: 'react-webpack-wie',
+	  	 filename:'index.html',
+	     inject: true,
+	   /*  minify: {
+	  	 	collapseWhitespace: true,
+	  	 },*/
+	  	 template: path.resolve(__dirname,'templates','index.html')
+	  }), //生成Html5文件
+      new webpack.optimize.CommonsChunkPlugin({
+      	name: 'commons'
+      }), // 公用代码打包
+	]
+}
+```
+**webpack.dev.js**(开发配置)
+
+```
+const merge = require('webpack-merge');
+const common = require('./webpack.common.js');
+const webpack = require('webpack');
+
+module.exports = merge(common,{
+	devtool: 'inline-source-map', //代码关联显示方式
+	devServer: {
+		historyApiFallback:true, //文件重定向，和react-router相关
+		hot:true,  //开启模块热替换
+		progress:true,
+		port:8000,  // 服务器端口
+		host:'localhost',
+		inline:true,
+		open: true,  // 自动打开浏览器标签
+	},
+	plugins: [
+		new webpack.NamedModulesPlugin(), //显示模块的相对路径
+		new webpack.HotModuleReplacementPlugin() // 加载热替换插件
+	]
+		
+
+});
+
+```
+
+**webpack.prod.js** (预编译配置)
+
+```
+// 预编译配置
+
+const merge = require('webpack-merge');
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
+const common = require('./webpack.common.js');
+
+module.exports = merge(common,{
+	plugins: [
+		new UglifyJSPlugin()  //代码压缩
+ 
+	]
+})
 
 
-
+```
