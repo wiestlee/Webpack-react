@@ -1,6 +1,5 @@
 # 前言
 
----
 
 本篇内容主要学习如何使用webpack构建一个React的应用。
 
@@ -9,7 +8,6 @@
 
 # 使用的技术栈
 
----
 
 该项目实战用到的主要框架有：
 
@@ -26,19 +24,17 @@
 
 #环境搭建
 
----
 
 系统环境：windows10
 
 # Node.js 安装
 
----
 
 进入Node.js官网[点击前往](https://nodejs.org/)，`选择LTS版本`
 
 
 # npm 部署
----
+
 
 ### npm更新并部署至全局
 
@@ -72,7 +68,6 @@ npm uninstall *** # 卸载node模块
 
 # 创建package.json 文件
 
----
 
 ``` 
 npm init
@@ -82,7 +77,6 @@ npm init -y #跳过提问阶段直接生成一个新package.json文件
 ```
 # 安装模块
 
----
 
 ```
 npm install webpack webpack-dev-server webpack-merge clean-webpack-plugin --save-dev
@@ -122,7 +116,6 @@ npm install extract-text-webpack-plugin --save-dev
 
 # 配置模块
 
----
 
 在项目根目录下生成.babelrc文件(window下文件重命名为.babelrc),并写入如下数据
 
@@ -258,6 +251,28 @@ module.exports = merge(common,{
  
 	]
 })
+
+
+```
+# 项目目录
+
+```js
+ webpackReact
+  |- /node_modules    //模块安装目录
+  |- /src    //代码目录
+    |- /container    //容器组件
+    |- /commponents    //展示组件
+      |- /images    //图片目录
+    |- /reducers    //reducers操作
+    |- /utils    //其他
+    |- index.js    //项目入口
+  |- /templates    //模板目录
+  |- .babelrc    //babel编译配置
+  |- package.json    //项目目录配置
+  |- README.md   //readme文件
+  |- webpack.common.js    //webpack共用配置
+  |- webpack.dev.js    //webpack开发配置
+  |- webpack.prod.js    //webpack编译配置
 
 
 ```
